@@ -36,9 +36,9 @@ const LoginPage = () => {
             trusted hospital-grade platform.
           </p>
           <div className="hero-icons" aria-label="Healthcare features">
-            <span>🩺 Clinical access</span>
-            <span>🧒 Maternal care</span>
-            <span>❤️ Patient safety</span>
+            <span>Clinical access</span>
+            <span>Maternal care</span>
+            <span>Patient safety</span>
           </div>
           <ul>
             <li>Real-time patient monitoring</li>

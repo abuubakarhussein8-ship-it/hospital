@@ -86,7 +86,7 @@ const AddAppointmentPage = () => {
 
     try {
       await createAppointment(payload)
-      setSuccess('✅ Appointment saved successfully.')
+      setSuccess('Appointment saved successfully.')
       window.setTimeout(() => navigate('/appointments'), 1000)
     } catch (err) {
       setError(err.message || 'Unable to create appointment.')
