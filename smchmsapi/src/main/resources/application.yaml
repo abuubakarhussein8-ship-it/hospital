@@ -1,0 +1,29 @@
+server:
+  port: 8081
+  address: 0.0.0.0
+
+spring:
+  config:
+    import: optional:file:${user.dir}/.env[.properties]
+  application:
+    name: smchmsapi
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/smchms_db
+    username: postgres
+    password: momsed123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
