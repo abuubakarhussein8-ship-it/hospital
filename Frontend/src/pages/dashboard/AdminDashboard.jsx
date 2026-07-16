@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Card from '../../components/common/Card'
+import Button from '../../components/common/Button'
 import { getDashboardData } from '../../services/api'
 
 const AdminDashboard = () => {
@@ -23,21 +25,31 @@ const AdminDashboard = () => {
     <div className="page-stack">
       <div className="page-header">
         <div>
-          <h2>Dashboard</h2>
-          <p>System summary for users, pregnancies, and clinic appointments.</p>
+          <h2>Admin Dashboard</h2>
+          <p>Admin huandaa mfumo na kuona muhtasari wa watumishi, pregnancies, na miadi ya kliniki.</p>
         </div>
       </div>
       {error && <p className="auth-error">{error}</p>}
       <div className="dashboard-grid">
-        <Card title="System Users" subtitle={stats?.totalUsers ?? '-'} />
+        <Card title="Total users" subtitle={stats?.totalUsers ?? '-'} />
         <Card title="Mothers" subtitle={stats?.totalMothers ?? '-'} />
         <Card title="Doctors" subtitle={stats?.totalDoctors ?? '-'} />
         <Card title="Nurses" subtitle={stats?.totalNurses ?? '-'} />
-        <Card title="Pregnancies" subtitle={stats?.totalPregnancies ?? '-'} />
-        <Card title="Appointments" subtitle={stats?.totalAppointments ?? '-'} />
-        <Card title="Pending Appointments" subtitle={stats?.pendingAppointments ?? '-'} />
+        <Card title="Operations" subtitle="Quick admin actions">
+          <div className="timeline-strip">
+            <div className="timeline-item">
+              <strong>Register staff</strong>
+              <p>Tambah doctor au nurse mpya kwa mfumo.</p>
+            </div>
+            <div className="timeline-item">
+              <strong>Monitor system</strong>
+              <p>Angalia counts za users na activity ya huduma.</p>
+            </div>
+            <Link to="/users"><Button>Manage users</Button></Link>
+          </div>
+        </Card>
       </div>
-      <Card title="Today in SMCHMS" className="table-card">
+      <Card title="Today in SMCHMS" subtitle="Mambo muhimu yanayoendelea leo" className="table-card">
         <table className="data-table">
           <thead>
             <tr>

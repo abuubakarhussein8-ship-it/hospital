@@ -2,6 +2,7 @@ package tz.ac.suza.wt.smchmsapi.model;
 
 import java.util.UUID;
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -31,27 +34,21 @@ public class Pregnancy {
     @Max(value = 42, message = "week must be between 1 and 42")
     private Integer week;
 
-    @NotBlank(message = "weight is required")
-    private String weight;
+    private LocalDate lmp;
 
-    @NotBlank(message = "bloodPressure is required")
-    private String bloodPressure;
+    private LocalDate edd;
 
     @NotBlank(message = "riskStatus is required")
     private String riskStatus;
 
     private String pregnancyStatus = "ACTIVE";
 
-    private LocalDate nextAncVisit;
-
-    private String ancNotes;
-
-    private String diagnosis;
-
-    private String medicalNotes;
-
     @ManyToOne
     @JoinColumn(name = "mother_id", nullable = false)
     private User mother;
+
+    @OneToMany(mappedBy = "pregnancy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private List<AncVisit> visits;
 
 }

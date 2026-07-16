@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import tz.ac.suza.wt.smchmsapi.model.Appointment;
@@ -28,12 +29,14 @@ class UserServiceImplTest {
         PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
         AppointmentRepository appointmentRepository = mock(AppointmentRepository.class);
         PregnancyRepository pregnancyRepository = mock(PregnancyRepository.class);
+        JdbcTemplate jdbcTemplate = mock(JdbcTemplate.class);
 
         UserServiceImpl service = new UserServiceImpl(
                 userRepository,
                 passwordEncoder,
                 appointmentRepository,
-                pregnancyRepository
+                pregnancyRepository,
+                jdbcTemplate
         );
 
         UUID userId = UUID.randomUUID();
@@ -45,6 +48,9 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(appointmentRepository.findByMotherId(userId)).thenReturn(List.of(appointment));
         when(pregnancyRepository.findByMotherId(userId)).thenReturn(List.of(pregnancy));
+        when(jdbcTemplate.queryForList(
+                "select 1 from information_schema.tables where table_name = 'children' limit 1"
+        )).thenReturn(List.of());
 
         service.deleteUser(userId);
 

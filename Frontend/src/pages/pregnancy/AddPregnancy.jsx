@@ -13,15 +13,11 @@ const AddPregnancyPage = () => {
   const [mothers, setMothers] = useState([])
   const [form, setForm] = useState({
     motherId: '',
+    lmp: '',
+    edd: '',
     week: '',
-    weight: '',
-    bloodPressure: '',
     riskStatus: 'LOW',
     pregnancyStatus: 'ACTIVE',
-    nextAncVisit: '',
-    ancNotes: '',
-    diagnosis: '',
-    medicalNotes: '',
   })
   const [error, setError] = useState('')
   const [loadingMothers, setLoadingMothers] = useState(false)
@@ -62,16 +58,11 @@ const AddPregnancyPage = () => {
     setError('')
 
     const payload = {
+      lmp: form.lmp || null,
+      edd: form.edd || null,
       week: Number(form.week),
-      weight: form.weight,
-
-      bloodPressure: form.bloodPressure,
       riskStatus: form.riskStatus,
       pregnancyStatus: form.pregnancyStatus,
-      nextAncVisit: form.nextAncVisit || null,
-      ancNotes: form.ancNotes,
-      diagnosis: form.diagnosis,
-      medicalNotes: form.medicalNotes,
       mother: { id: form.motherId },
     }
 
@@ -84,82 +75,95 @@ const AddPregnancyPage = () => {
   }
 
   return (
-    <Card title="Register ANC / Pregnancy" subtitle="Nurse records maternal health and next ANC visit">
+    <Card title="New Pregnancy" subtitle="Nurse anaunganisha pregnancy mpya kwa profile ya mama mmoja">
       <form className="form-stack" onSubmit={handleSubmit}>
         {error && <p className="auth-error">{error}</p>}
+        <div className="form-section">
+          <div className="section-title">
+            <div>
+              <h4>Mother selection</h4>
+              <p>Chagua mama ambaye tayari ana profile ya hospitali.</p>
+            </div>
+            <span className="section-chip">Profile moja</span>
+          </div>
+          <div className="input-group">
+            <label htmlFor="motherId">Mother</label>
+            <select
+              id="motherId"
+              value={form.motherId}
+              onChange={(event) => setForm({ ...form, motherId: event.target.value })}
+              required
+              disabled={loadingMothers || mothers.length === 0}
+            >
+              <option value="">{loadingMothers ? 'Loading...' : 'Select mother'}</option>
+              {mothers.map((mother) => (
+                <option key={mother.id} value={mother.id}>
+                  {mother.name} - {mother.email}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-        <div className="input-group">
-          <label htmlFor="motherId">Mother</label>
-          <select
-            id="motherId"
-            value={form.motherId}
-            onChange={(event) => setForm({ ...form, motherId: event.target.value })}
-            required
-            disabled={loadingMothers || mothers.length === 0}
-          >
-            <option value="">{loadingMothers ? 'Loading...' : 'Select mother'}</option>
-            {mothers.map((mother) => (
-              <option key={mother.id} value={mother.id}>
-                {mother.name} - {mother.email}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="form-grid two-columns">
-          <Input
-            label="Pregnancy week"
-            id="week"
-            type="number"
-            min="1"
-            max="42"
-            value={form.week}
-            onChange={(event) => setForm({ ...form, week: event.target.value })}
-            required
-          />
-          <Input
-            label="Weight"
-            id="weight"
-            placeholder="68 kg"
-            value={form.weight}
-            onChange={(event) => setForm({ ...form, weight: event.target.value })}
-            required
-          />
-          <Input
-            label="Blood pressure"
-            id="bloodPressure"
-            placeholder="120/80"
-            value={form.bloodPressure}
-            onChange={(event) => setForm({ ...form, bloodPressure: event.target.value })}
-            required
-          />
-          <Input
-            label="Next ANC visit"
-            id="nextAncVisit"
-            type="date"
-            value={form.nextAncVisit}
-            onChange={(event) => setForm({ ...form, nextAncVisit: event.target.value })}
-          />
-        </div>
-        <div className="input-group">
-          <label htmlFor="riskStatus">Risk status</label>
-          <select
-            id="riskStatus"
-            value={form.riskStatus}
-            onChange={(event) => setForm({ ...form, riskStatus: event.target.value })}
-          >
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-          </select>
-        </div>
-        <div className="input-group">
-          <label htmlFor="ancNotes">ANC visit notes</label>
-          <textarea
-            id="ancNotes"
-            rows="4"
-            value={form.ancNotes}
-            onChange={(event) => setForm({ ...form, ancNotes: event.target.value })}
-          />
+        <div className="form-section">
+          <div className="section-title">
+            <div>
+              <h4>Pregnancy overview</h4>
+              <p>Hapa tunaweka taarifa ya msingi ya ujauzito.</p>
+            </div>
+            <span className="section-chip">Active pregnancy</span>
+          </div>
+          <div className="form-grid two-columns">
+            <Input
+              label="LMP"
+              id="lmp"
+              type="date"
+              value={form.lmp}
+              onChange={(event) => setForm({ ...form, lmp: event.target.value })}
+            />
+            <Input
+              label="EDD"
+              id="edd"
+              type="date"
+              value={form.edd}
+              onChange={(event) => setForm({ ...form, edd: event.target.value })}
+            />
+            <Input
+              label="Pregnancy week"
+              id="week"
+              type="number"
+              min="1"
+              max="42"
+              value={form.week}
+              onChange={(event) => setForm({ ...form, week: event.target.value })}
+              required
+            />
+            <div className="input-group">
+              <label htmlFor="riskStatus">Risk status</label>
+              <select
+                id="riskStatus"
+                value={form.riskStatus}
+                onChange={(event) => setForm({ ...form, riskStatus: event.target.value })}
+              >
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+            </div>
+            <div className="input-group">
+              <label htmlFor="pregnancyStatus">Pregnancy status</label>
+              <select
+                id="pregnancyStatus"
+                value={form.pregnancyStatus}
+                onChange={(event) => setForm({ ...form, pregnancyStatus: event.target.value })}
+              >
+                <option value="ACTIVE">Active</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="REFERRED">Referred</option>
+                <option value="COMPLETED">Completed</option>
+              </select>
+            </div>
+          </div>
         </div>
         <div className="form-actions">
           <Button type="submit">Save pregnancy</Button>
@@ -173,4 +177,3 @@ const AddPregnancyPage = () => {
 }
 
 export default AddPregnancyPage
-

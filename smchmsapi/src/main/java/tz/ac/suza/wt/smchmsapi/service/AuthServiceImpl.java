@@ -2,10 +2,13 @@ package tz.ac.suza.wt.smchmsapi.service;
 
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import tz.ac.suza.wt.smchmsapi.dto.LoginRequestDTO;
 import tz.ac.suza.wt.smchmsapi.dto.LoginResponseDTO;
@@ -47,12 +50,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponseDTO login(LoginRequestDTO request) {
         User user = userRepository.findByEmail(request.getEmail());
-        if (user == null) {
-            throw new RuntimeException("Invalid email or password");
-        }
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect email or password.");
         }
 
         String token = jwtService.generateToken(
@@ -85,13 +84,24 @@ public class AuthServiceImpl implements AuthService {
 
         boolean isAdminRequest = requestedRole == UserRole.ADMIN;
         boolean isStaffRequest = requestedRole == UserRole.DOCTOR || requestedRole == UserRole.NURSE;
-        boolean isAuthenticatedAdmin = authentication != null && authentication.isAuthenticated()
+        boolean isAuthenticatedUser = authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
+        boolean isAuthenticatedAdmin = isAuthenticatedUser
                 && authentication.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAuthenticatedNurse = isAuthenticatedUser
+                && authentication.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_NURSE"));
 
         if (isAdminRequest || isStaffRequest) {
             if (!isAuthenticatedAdmin) {
                 throw new RuntimeException("Only admin can create admin, doctor, or nurse accounts.");
             }
+        }
+
+        // Mothers may self-register without a token. When an authenticated staff
+        // member creates an account, only a nurse may create a mother account.
+        if (requestedRole == UserRole.MOTHER && isAuthenticatedUser
+                && !isAuthenticatedNurse) {
+            throw new RuntimeException("Only nurse can create mother accounts.");
         }
 
         if (userRepository.count() == 0) {

@@ -38,21 +38,22 @@ const NurseDashboard = () => {
       <div className="page-header">
         <div>
           <h2>Nurse Dashboard</h2>
-          <p>Support appointments and maternal monitoring.</p>
+          <p>Hapa ndipo follow-up ya mama, pregnancy, na ANC visit zinapopangwa kwa utulivu.</p>
         </div>
       </div>
 
       <div className="dashboard-grid">
-        <Card title="Appointments" subtitle="Prepare visits">
+        <Card title="Register mother" subtitle="Create or open mother profile">
+          <p className="empty-state">Anza kwa profile moja ya mama kabla ya pregnancy au ANC.</p>
+          <Link to="/users/add"><Button>Register mother</Button></Link>
+        </Card>
+        <Card title="Create pregnancy" subtitle="Start active pregnancy">
+          <p className="empty-state">{pregnancies.length} pregnancy record(s) are available.</p>
+          <Link to="/pregnancies/add"><Button>Create pregnancy</Button></Link>
+        </Card>
+        <Card title="Today&apos;s review" subtitle="Follow active ANC work">
           <p className="empty-state">{pendingAppointments.length} pending appointment(s) need review.</p>
           <Link to="/appointments"><Button>Review appointments</Button></Link>
-        </Card>
-        <Card title="Pregnancy Records" subtitle="Update monitoring">
-          <p className="empty-state">{pregnancies.length} pregnancy record(s) available.</p>
-          <Link to="/pregnancies"><Button>Open records</Button></Link>
-        </Card>
-        <Card title="Alerts" subtitle="Follow risk cases">
-          <p className="empty-state">{pregnancies.filter((pregnancy) => pregnancy.riskStatus?.toLowerCase() === 'high').length} high-risk case(s).</p>
         </Card>
       </div>
 

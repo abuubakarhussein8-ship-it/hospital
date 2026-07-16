@@ -16,13 +16,17 @@ const AppointmentListPage = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const isMother = user?.role === 'MOTHER'
+  const isDoctor = user?.role === 'DOCTOR'
   const canManage = ['ADMIN', 'DOCTOR', 'NURSE'].includes(user?.role)
 
   useEffect(() => {
     const load = async () => {
       try {
         const appointmentData = isMother ? await getMyAppointments() : await getAppointments()
-        setAppointments(appointmentData)
+        const visibleAppointments = isDoctor
+          ? appointmentData.filter((appointment) => appointment.doctor?.id === user?.id)
+          : appointmentData
+        setAppointments(visibleAppointments)
 
         if (canManage) {
           setDoctors(await getDoctors())
@@ -35,7 +39,7 @@ const AppointmentListPage = () => {
     }
 
     load()
-  }, [canManage, isMother])
+  }, [canManage, isDoctor, isMother, user?.id])
 
   const filteredAppointments = useMemo(() => {
     const value = search.trim().toLowerCase()
@@ -87,7 +91,9 @@ const AppointmentListPage = () => {
           <h2>Appointments</h2>
           <p>{isMother ? 'Request and follow your clinic appointments.' : 'Review mother appointment requests.'}</p>
         </div>
-        <Link to="/appointments/add"><Button>Add appointment</Button></Link>
+        {['NURSE', 'MOTHER'].includes(user?.role) && (
+          <Link to="/appointments/add"><Button>Add appointment</Button></Link>
+        )}
       </div>
 
       {isMother && (
@@ -104,7 +110,7 @@ const AppointmentListPage = () => {
         </Card>
       )}
 
-      <Card className="table-card">
+      <Card title="Appointment register" subtitle="Timeline ya requests na updates" className="table-card">
         <div className="table-toolbar">
           <strong>{isMother ? 'My appointments' : 'Appointment requests'}</strong>
           <input

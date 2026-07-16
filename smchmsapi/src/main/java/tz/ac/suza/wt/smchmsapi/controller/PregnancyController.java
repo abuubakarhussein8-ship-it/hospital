@@ -62,5 +62,10 @@ public class PregnancyController {
         pregnancyService.delete(id);
         return ResponseEntity.noContent().build();
     }
-}
 
+    @DeleteMapping("/{id}/admin-cleanup")
+    public ResponseEntity<Void> adminCleanup(@PathVariable UUID id) {
+        pregnancyService.adminCleanup(id);
+        return ResponseEntity.noContent().build();
+    }
+}

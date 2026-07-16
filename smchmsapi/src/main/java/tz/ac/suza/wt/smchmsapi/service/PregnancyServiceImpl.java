@@ -9,10 +9,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import tz.ac.suza.wt.smchmsapi.model.Pregnancy;
 import tz.ac.suza.wt.smchmsapi.model.User;
 import tz.ac.suza.wt.smchmsapi.model.UserRole;
+import tz.ac.suza.wt.smchmsapi.repository.AncVisitRepository;
 import tz.ac.suza.wt.smchmsapi.repository.PregnancyRepository;
 import tz.ac.suza.wt.smchmsapi.repository.UserRepository;
 
@@ -21,10 +23,12 @@ public class PregnancyServiceImpl implements PregnancyService {
 
     private final PregnancyRepository repo;
     private final UserRepository userRepository;
+    private final AncVisitRepository ancVisitRepository;
 
-    public PregnancyServiceImpl(PregnancyRepository repo, UserRepository userRepository) {
+    public PregnancyServiceImpl(PregnancyRepository repo, UserRepository userRepository, AncVisitRepository ancVisitRepository) {
         this.repo = repo;
         this.userRepository = userRepository;
+        this.ancVisitRepository = ancVisitRepository;
     }
 
     @Override
@@ -82,14 +86,10 @@ public class PregnancyServiceImpl implements PregnancyService {
         }
 
         existing.setWeek(p.getWeek());
-        existing.setWeight(p.getWeight());
-        existing.setBloodPressure(p.getBloodPressure());
+        existing.setLmp(p.getLmp());
+        existing.setEdd(p.getEdd());
         existing.setRiskStatus(p.getRiskStatus());
         existing.setPregnancyStatus(p.getPregnancyStatus());
-        existing.setNextAncVisit(p.getNextAncVisit());
-        existing.setAncNotes(p.getAncNotes());
-        existing.setDiagnosis(p.getDiagnosis());
-        existing.setMedicalNotes(p.getMedicalNotes());
 
         if (p.getMother() == null || p.getMother().getId() == null) {
             throw new RuntimeException("mother is required");
@@ -105,13 +105,36 @@ public class PregnancyServiceImpl implements PregnancyService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         Pregnancy pregnancy = getById(id);
         authorizeAccess(pregnancy);
         if (isMotherRole(SecurityContextHolder.getContext().getAuthentication())) {
             throw new AccessDeniedException("Mothers can only view pregnancy records");
         }
+        ancVisitRepository.deleteAllByPregnancyId(id);
+        ancVisitRepository.flush();
         repo.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void adminCleanup(UUID id) {
+        Pregnancy pregnancy = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pregnancy not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("Authentication required");
+        }
+
+        if (!hasRole(authentication, UserRole.ADMIN.name())) {
+            throw new AccessDeniedException("Only admin can perform cleanup");
+        }
+
+        ancVisitRepository.deleteAllByPregnancyId(id);
+        ancVisitRepository.flush();
+        repo.delete(pregnancy);
     }
 
     private void ensureStaffAccess() {

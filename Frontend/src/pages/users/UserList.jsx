@@ -65,7 +65,7 @@ const UserListPage = () => {
         {isAdmin && <Link to="/users/add"><Button>Add New</Button></Link>}
       </div>
 
-      <Card className="table-card">
+      <Card title="Users registry" subtitle="Watumishi na mothers walio kwenye mfumo" className="table-card">
         <div className="table-toolbar">
           <strong>System User</strong>
           <input

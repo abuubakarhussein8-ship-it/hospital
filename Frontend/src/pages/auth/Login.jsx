@@ -7,21 +7,25 @@ import { useAuth } from '../../hooks/useAuth'
 const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
-    setSuccess('')
+    setRedirecting(false)
+    setLoading(true)
 
     try {
       await login(form)
-      setSuccess('Login successful.')
-      window.setTimeout(() => navigate('/dashboard'), 1000)
+      setRedirecting(true)
+      window.setTimeout(() => navigate('/dashboard'), 1500)
     } catch (err) {
       setError(err.message || 'Unable to sign in right now.')
+      setForm((current) => ({ ...current, password: '' }))
+      setLoading(false)
     }
   }
 
@@ -30,32 +34,25 @@ const LoginPage = () => {
       <div className="auth-shell">
         <section className="auth-hero">
           <div className="hero-badge">SMCHMS</div>
-          <h1>Secure care starts with a connected system.</h1>
-          <p>
-            Access maternal and child health records with confidence through our
-            trusted hospital-grade platform.
-          </p>
-          <div className="hero-icons" aria-label="Healthcare features">
-            <span>Clinical access</span>
-            <span>Maternal care</span>
-            <span>Patient safety</span>
-          </div>
-          <ul>
-            <li>Real-time patient monitoring</li>
-            <li>Protected clinical data access</li>
-            <li>Role-based dashboards for every team</li>
-          </ul>
+          <h1>SMART Maternal & Child Health Monitoring System</h1>
         </section>
 
         <section className="auth-card">
           <div className="auth-card-header">
-            <h2>Welcome back</h2>
-            <p>Sign in to continue to your dashboard</p>
+            <h2>Login</h2>
+            <p>Ingiza akaunti yako ili uende kwenye dashboard husika.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="form-stack">
-            {error && <p className="auth-error">{error}</p>}
-            {success && <p className="auth-success">{success}</p>}
+            {error && (
+              <div className="login-error-alert" role="alert">
+                <span className="login-error-icon" aria-hidden="true">×</span>
+                <div>
+                  <strong>Oops! Login failed</strong>
+                  <p>{error}</p>
+                </div>
+              </div>
+            )}
             <Input
               label="Email address"
               id="email"
@@ -72,9 +69,21 @@ const LoginPage = () => {
               placeholder="Enter your password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
+              className={error ? 'login-password-error' : ''}
               required
             />
-            <Button type="submit">Sign In</Button>
+            <div className={error ? 'login-submit-shake' : ''}>
+              <Button type="submit" disabled={loading}>
+                {loading ? (
+                  <span className="button-inline-loader">
+                    <span className="button-spinner" aria-hidden="true" />
+                    Signing in...
+                  </span>
+                ) : (
+                  'Sign In'
+                )}
+              </Button>
+            </div>
           </form>
 
           <div className="auth-links">
@@ -82,6 +91,22 @@ const LoginPage = () => {
           </div>
         </section>
       </div>
+      {redirecting && (
+        <div className="login-loading-overlay" role="status" aria-live="polite">
+          <div className="login-loading-card">
+            <div className="login-loading-spinner" aria-hidden="true" />
+            <h2>Signing you in</h2>
+            <p>Please wait while we securely prepare your dashboard.</p>
+            <div className="login-loading-steps" aria-label="Login progress">
+              <span>Verifying account</span>
+              <span>Loading dashboard</span>
+            </div>
+            <div className="login-loading-track" aria-hidden="true">
+              <span />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

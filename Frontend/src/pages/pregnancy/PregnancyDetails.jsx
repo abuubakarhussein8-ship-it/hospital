@@ -29,29 +29,44 @@ const PregnancyDetailsPage = () => {
           <p>Review mother and clinical tracking details.</p>
         </div>
         <div className="actions-row">
+          <Link to={`/pregnancies/${id}/timeline`}><Button variant="secondary">ANC timeline</Button></Link>
           <Link to={`/pregnancies/${id}/edit`}><Button>Edit</Button></Link>
           <Link to="/pregnancies"><Button variant="secondary">Back</Button></Link>
         </div>
       </div>
 
-      <Card>
+      <Card title="Pregnancy record" subtitle="Header ya pregnancy na history muhimu">
         {error && <p className="auth-error">{error}</p>}
         {!pregnancy ? (
           <p className="empty-state">Loading pregnancy...</p>
         ) : (
-          <div className="detail-grid">
-            <div className="detail-item"><span>Mother</span><strong>{pregnancy.mother?.name || 'Current mother'}</strong></div>
-            <div className="detail-item"><span>Mother email</span><strong>{pregnancy.mother?.email || 'Not available'}</strong></div>
-            <div className="detail-item"><span>Week</span><strong>{pregnancy.week}</strong></div>
-            <div className="detail-item"><span>Weight</span><strong>{pregnancy.weight}</strong></div>
-            <div className="detail-item"><span>Blood pressure</span><strong>{pregnancy.bloodPressure}</strong></div>
-            <div className="detail-item"><span>Risk status</span><strong>{pregnancy.riskStatus}</strong></div>
-            <div className="detail-item"><span>Pregnancy status</span><strong>{pregnancy.pregnancyStatus || 'ACTIVE'}</strong></div>
-            <div className="detail-item"><span>Next ANC visit</span><strong>{pregnancy.nextAncVisit || 'Not scheduled'}</strong></div>
-            <div className="detail-item"><span>ANC notes</span><strong>{pregnancy.ancNotes || 'No ANC notes'}</strong></div>
-            <div className="detail-item"><span>Diagnosis</span><strong>{pregnancy.diagnosis || 'Not reviewed yet'}</strong></div>
-            <div className="detail-item"><span>Medical notes</span><strong>{pregnancy.medicalNotes || 'No medical notes'}</strong></div>
-          </div>
+          <>
+            <div className="timeline-strip">
+              <div className="timeline-item">
+                <strong>Mother profile</strong>
+                <div>
+                  <p>{pregnancy.mother?.name || 'Current mother'}</p>
+                  <p>{pregnancy.mother?.email || 'Not available'}</p>
+                </div>
+              </div>
+            <div className="timeline-item">
+              <strong>Pregnancy status</strong>
+              <div>
+                  <p>LMP: {pregnancy.lmp || 'Not set'}</p>
+                  <p>EDD: {pregnancy.edd || 'Not set'}</p>
+                  <p>Week {pregnancy.week}</p>
+                  <p>Risk: {pregnancy.riskStatus}</p>
+                </div>
+              </div>
+              <div className="timeline-item">
+                <strong>Clinical note</strong>
+                <div>
+                  <p>Pregnancy header only.</p>
+                  <p>ANC details live in the visit timeline.</p>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </Card>
     </div>

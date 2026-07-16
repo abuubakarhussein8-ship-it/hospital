@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:8081/api/v1'
+// When opened from a phone on the same Wi-Fi, window.location.hostname is the
+// PC's LAN address. VITE_API_BASE_URL can still override this for deployment.
+const apiHost = typeof window === 'undefined' ? 'localhost' : window.location.hostname
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || `http://${apiHost}:8081/api/v1`
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
@@ -37,7 +40,9 @@ const request = async (endpoint, options = {}) => {
       ? data
       : (data && (data.message || data.error)) || 'Request failed'
 
-    if (response.status === 401 || response.status === 403) {
+    // A failed login must remain on this page so Login can show its error state.
+    // Other protected API failures still clear an expired session and return to login.
+    if ((response.status === 401 || response.status === 403) && endpoint !== '/auth/login') {
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
@@ -45,9 +50,10 @@ const request = async (endpoint, options = {}) => {
       }
     }
 
-    throw new Error(
-      `HTTP ${response.status} ${response.statusText} calling ${url}: ${message}`
-    )
+    const error = new Error(message)
+    error.status = response.status
+    error.statusText = response.statusText
+    throw error
   }
 
   return data
@@ -86,6 +92,8 @@ export const getPregnancy = (id) => api.get(`/pregnancies/${id}`)
 export const createPregnancy = (payload) => api.post('/pregnancies', payload)
 export const updatePregnancy = (id, payload) => api.put(`/pregnancies/${id}`, payload)
 export const deletePregnancy = (id) => api.delete(`/pregnancies/${id}`)
+export const getAncVisits = (pregnancyId) => api.get(`/pregnancies/${pregnancyId}/anc-visits`)
+export const createAncVisit = (pregnancyId, payload) => api.post(`/pregnancies/${pregnancyId}/anc-visits`, payload)
 
 export const getAppointments = () => api.get('/appointments')
 export const getMyAppointments = () => api.get('/appointments/my')

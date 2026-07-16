@@ -15,15 +15,11 @@ const EditPregnancyPage = () => {
   const [mothers, setMothers] = useState([])
   const [form, setForm] = useState({
     motherId: '',
+    lmp: '',
+    edd: '',
     week: '',
-    weight: '',
-    bloodPressure: '',
     riskStatus: 'LOW',
     pregnancyStatus: 'ACTIVE',
-    nextAncVisit: '',
-    ancNotes: '',
-    diagnosis: '',
-    medicalNotes: '',
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -38,15 +34,11 @@ const EditPregnancyPage = () => {
         setMothers(motherOptions)
         setForm({
           motherId: pregnancy.mother?.id || motherOptions[0]?.id || '',
+          lmp: pregnancy.lmp || '',
+          edd: pregnancy.edd || '',
           week: pregnancy.week || '',
-          weight: pregnancy.weight || '',
-          bloodPressure: pregnancy.bloodPressure || '',
           riskStatus: pregnancy.riskStatus || 'LOW',
           pregnancyStatus: pregnancy.pregnancyStatus || 'ACTIVE',
-          nextAncVisit: pregnancy.nextAncVisit || '',
-          ancNotes: pregnancy.ancNotes || '',
-          diagnosis: pregnancy.diagnosis || '',
-          medicalNotes: pregnancy.medicalNotes || '',
         })
       } catch (err) {
         setError(err.message || 'Unable to load pregnancy.')
@@ -63,15 +55,11 @@ const EditPregnancyPage = () => {
     setError('')
 
     const payload = {
+      lmp: form.lmp || null,
+      edd: form.edd || null,
       week: Number(form.week),
-      weight: form.weight,
-      bloodPressure: form.bloodPressure,
       riskStatus: form.riskStatus,
       pregnancyStatus: form.pregnancyStatus,
-      nextAncVisit: form.nextAncVisit || null,
-      ancNotes: form.ancNotes,
-      diagnosis: form.diagnosis,
-      medicalNotes: form.medicalNotes,
       mother: { id: form.motherId },
     }
 
@@ -101,24 +89,17 @@ const EditPregnancyPage = () => {
           </select>
         </div>
         <div className="form-grid two-columns">
+          <Input label="LMP" id="lmp" type="date" value={form.lmp} onChange={(event) => setForm({ ...form, lmp: event.target.value })} disabled={isDoctor} />
+          <Input label="EDD" id="edd" type="date" value={form.edd} onChange={(event) => setForm({ ...form, edd: event.target.value })} disabled={isDoctor} />
           <Input label="Pregnancy week" id="week" type="number" min="1" max="42" value={form.week} onChange={(event) => setForm({ ...form, week: event.target.value })} required disabled={isDoctor} />
-          <Input label="Weight" id="weight" value={form.weight} onChange={(event) => setForm({ ...form, weight: event.target.value })} required disabled={isDoctor} />
-          <Input label="Blood pressure" id="bloodPressure" value={form.bloodPressure} onChange={(event) => setForm({ ...form, bloodPressure: event.target.value })} required disabled={isDoctor} />
-          <Input label="Next ANC visit" id="nextAncVisit" type="date" value={form.nextAncVisit} onChange={(event) => setForm({ ...form, nextAncVisit: event.target.value })} disabled={isDoctor} />
-        </div>
-        {(isNurse || user?.role === 'ADMIN') && (
           <div className="input-group">
-            <label htmlFor="ancNotes">ANC visit notes</label>
-            <textarea id="ancNotes" rows="4" value={form.ancNotes} onChange={(event) => setForm({ ...form, ancNotes: event.target.value })} />
+            <label htmlFor="riskStatus">Risk status</label>
+            <select id="riskStatus" value={form.riskStatus} onChange={(event) => setForm({ ...form, riskStatus: event.target.value })}>
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+            </select>
           </div>
-        )}
-        <div className="input-group">
-          <label htmlFor="riskStatus">Risk status</label>
-          <select id="riskStatus" value={form.riskStatus} onChange={(event) => setForm({ ...form, riskStatus: event.target.value })}>
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-          </select>
         </div>
         <div className="input-group">
           <label htmlFor="pregnancyStatus">Pregnancy status</label>
@@ -129,18 +110,6 @@ const EditPregnancyPage = () => {
             <option value="CLOSED">Closed</option>
           </select>
         </div>
-        {(isDoctor || user?.role === 'ADMIN') && (
-          <>
-            <div className="input-group">
-              <label htmlFor="diagnosis">Diagnosis</label>
-              <textarea id="diagnosis" rows="3" value={form.diagnosis} onChange={(event) => setForm({ ...form, diagnosis: event.target.value })} />
-            </div>
-            <div className="input-group">
-              <label htmlFor="medicalNotes">Medical notes</label>
-              <textarea id="medicalNotes" rows="4" value={form.medicalNotes} onChange={(event) => setForm({ ...form, medicalNotes: event.target.value })} />
-            </div>
-          </>
-        )}
         <div className="form-actions">
           <Button type="submit">Update pregnancy</Button>
           <Button variant="secondary" onClick={() => navigate(`/pregnancies/${id}`)}>Cancel</Button>

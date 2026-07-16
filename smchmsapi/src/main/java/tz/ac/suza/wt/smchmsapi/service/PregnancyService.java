@@ -18,5 +18,6 @@ public interface PregnancyService {
     Pregnancy update(UUID id, Pregnancy p);
 
     void delete(UUID id);
-}
 
+    void adminCleanup(UUID id);
+}

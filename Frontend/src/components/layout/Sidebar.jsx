@@ -4,16 +4,13 @@ const navItemsByRole = {
   ADMIN: [
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/users', label: 'Users' },
-    { to: '/appointments', label: 'Appointments' },
     { to: '/reports', label: 'Reports' },
     { to: '/profile', label: 'Profile' },
   ],
   DOCTOR: [
     { to: '/dashboard', label: 'Dashboard' },
-    { to: '/users', label: 'Users' },
     { to: '/appointments', label: 'Appointments' },
     { to: '/pregnancies', label: 'Pregnancies' },
-    { to: '/reports', label: 'Reports' },
     { to: '/profile', label: 'Profile' },
   ],
   NURSE: [
@@ -21,7 +18,6 @@ const navItemsByRole = {
     { to: '/users', label: 'Users' },
     { to: '/appointments', label: 'Appointments' },
     { to: '/pregnancies', label: 'Pregnancies' },
-    { to: '/reports', label: 'Reports' },
     { to: '/profile', label: 'Profile' },
   ],
   MOTHER: [

@@ -66,11 +66,8 @@ const PregnancyListPage = () => {
               <tr>
                 <th>Mother</th>
                 <th>Week</th>
-                <th>Weight</th>
-                <th>Blood pressure</th>
                 <th>Risk</th>
                 <th>Status</th>
-                <th>Next ANC</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -79,11 +76,8 @@ const PregnancyListPage = () => {
                 <tr key={pregnancy.id}>
                   <td>{pregnancy.mother?.name || 'Current mother'}</td>
                   <td>{pregnancy.week}</td>
-                  <td>{pregnancy.weight}</td>
-                  <td>{pregnancy.bloodPressure}</td>
                   <td>{pregnancy.riskStatus}</td>
                   <td>{pregnancy.pregnancyStatus || 'ACTIVE'}</td>
-                  <td>{pregnancy.nextAncVisit || '-'}</td>
                   <td>
                     <div className="actions-row">
                       <Link to={`/pregnancies/${pregnancy.id}`}>View</Link>
